@@ -1,27 +1,31 @@
 from flask import Flask, render_template, Response
 import cv2
-import socket
 import zmq
 import time
-import base64
 import numpy as np
 import threading
+import json
 from utils import utils
 
 app = Flask(__name__)
 
 base64Frame = ''
+peopleIn = 0
+peopleOut = 0
 
 
 def getFrames():
-    global base64Frame
+    global base64Frame, peopleIn, peopleOut
     context = zmq.Context()
     socket = context.socket(zmq.PULL)
     socket.connect("tcp://127.0.0.1:5555")
 
     while True:
-        response = socket.recv()
-        base64Frame = response.decode('utf-8')
+        time.sleep(1)
+        response = json.loads(socket.recv())
+        base64Frame = response['frame'].split("'")[1]
+        peopleIn = response['peopleIn']
+        peopleOut = response['peopleOut']
 
 
 def gen_frames():  # generate frame by frame from camera
@@ -40,22 +44,24 @@ def gen_frames():  # generate frame by frame from camera
 def fetchFrames():
     global base64Frame
     while True:
-        time.sleep(0.5)
+        time.sleep(1)
         frame = utils.Utils.convertBase64Frame2Frame(base64Frame)
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
 
 
-# def fetchPeopleIn():
-#     peopleIn = 1
-#     yield peopleIn
+@app.route('/people_in')
+def people_in():
+    global peopleIn
+    # Video streaming route. Put this in the src attribute of an img tag
+    return str(peopleIn)
 
 
-# @app.route('/people_in')
-# def people_in():
-#     # Video streaming route. Put this in the src attribute of an img tag
-#     return Response(fetchPeopleIn(), mimetype='text/html')
-#     # yield "10"
+@app.route('/people_out')
+def people_out():
+    global peopleOut
+    # Video streaming route. Put this in the src attribute of an img tag
+    return str(peopleOut)
 
 
 @app.route('/video_feed')
@@ -67,10 +73,7 @@ def video_feed():
 @app.route('/')
 def index():
     """Video streaming home page."""
-    for i in range(5):
-        peopleInData = i
-        time.sleep(1)
-    return render_template('index.html', peopleIn=peopleInData)
+    return render_template('index.html')
 
 
 if __name__ == '__main__':
