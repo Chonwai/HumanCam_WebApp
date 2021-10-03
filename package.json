@@ -5,11 +5,12 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json,html}' --config ./.prettierrc"
+        "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc"
     },
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@prettier/plugin-python": "^0.0.0-development",
         "tailwindcss": "^2.2.16"
     }
 }

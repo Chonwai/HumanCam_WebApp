@@ -2,15 +2,26 @@ from flask import Flask, render_template, Response
 import cv2
 import socket
 import zmq
-import sys
+import time
 import base64
 import numpy as np
+import threading
+from utils import utils
 
 app = Flask(__name__)
 
-# camera = cv2.VideoCapture(0)  # use 0 for web camera
-#  for cctv camera use rtsp://username:password@ip_address:554/user=username_password='password'_channel=channel_number_stream=0.sdp' instead of camera
-# for local webcam use cv2.VideoCapture(0)
+base64Frame = ''
+
+
+def getFrames():
+    global base64Frame
+    context = zmq.Context()
+    socket = context.socket(zmq.PULL)
+    socket.connect("tcp://127.0.0.1:5555")
+
+    while True:
+        response = socket.recv()
+        base64Frame = response.decode('utf-8')
 
 
 def gen_frames():  # generate frame by frame from camera
@@ -27,27 +38,24 @@ def gen_frames():  # generate frame by frame from camera
 
 
 def fetchFrames():
-    context = zmq.Context()
-
-    socket = context.socket(zmq.PULL)
-    socket.connect("tcp://127.0.0.1:5555")
-
+    global base64Frame
     while True:
-        response = socket.recv()
-        frameBase64 = response.decode('utf-8')
-        nparr = np.fromstring(base64.b64decode(frameBase64), np.uint8)
-        frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-
-        ret, buffer = cv2.imencode('.jpg', frame)
-        frame = buffer.tobytes()
+        time.sleep(0.5)
+        frame = utils.Utils.convertBase64Frame2Frame(base64Frame)
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
 
-@app.route('/people_in')
-def people_in():
-    # Video streaming route. Put this in the src attribute of an img tag
-    yield "10"
 
+# def fetchPeopleIn():
+#     peopleIn = 1
+#     yield peopleIn
+
+
+# @app.route('/people_in')
+# def people_in():
+#     # Video streaming route. Put this in the src attribute of an img tag
+#     return Response(fetchPeopleIn(), mimetype='text/html')
+#     # yield "10"
 
 
 @app.route('/video_feed')
@@ -59,8 +67,13 @@ def video_feed():
 @app.route('/')
 def index():
     """Video streaming home page."""
-    return render_template('index.html')
+    for i in range(5):
+        peopleInData = i
+        time.sleep(1)
+    return render_template('index.html', peopleIn=peopleInData)
 
 
 if __name__ == '__main__':
+    frameThread = threading.Thread(target=getFrames)
+    frameThread.start()
     app.run(debug=True)
