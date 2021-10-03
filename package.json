@@ -1,0 +1,15 @@
+{
+    "name": "humancam_webapp",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json,html}' --config ./.prettierrc"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "tailwindcss": "^2.2.16"
+    }
+}
