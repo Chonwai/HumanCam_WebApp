@@ -1,6 +1,6 @@
 # HumanCam_WebApp
 
-# How to use
+## How to use
 ```bash
 python app.py
 ```
