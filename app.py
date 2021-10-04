@@ -21,11 +21,11 @@ def getFrames():
     socket.connect("tcp://127.0.0.1:5555")
 
     while True:
-        time.sleep(1)
         response = json.loads(socket.recv())
         base64Frame = response['frame'].split("'")[1]
         peopleIn = response['peopleIn']
         peopleOut = response['peopleOut']
+        time.sleep(0.3)
 
 
 def gen_frames():  # generate frame by frame from camera
@@ -44,7 +44,6 @@ def gen_frames():  # generate frame by frame from camera
 def fetchFrames():
     global base64Frame
     while True:
-        time.sleep(1)
         frame = utils.Utils.convertBase64Frame2Frame(base64Frame)
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
