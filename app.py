@@ -25,7 +25,7 @@ def getFrames():
         base64Frame = response['frame'].split("'")[1]
         peopleIn = response['peopleIn']
         peopleOut = response['peopleOut']
-        time.sleep(0.3)
+        # time.sleep(0.1)
 
 
 def gen_frames():  # generate frame by frame from camera
@@ -61,6 +61,14 @@ def people_out():
     global peopleOut
     # Video streaming route. Put this in the src attribute of an img tag
     return str(peopleOut)
+
+
+@app.route('/people_flow')
+def people_flow():
+    global peopleIn, peopleOut
+    peopleFlow = peopleIn + peopleOut
+    # Video streaming route. Put this in the src attribute of an img tag
+    return str(peopleFlow)
 
 
 @app.route('/video_feed')
