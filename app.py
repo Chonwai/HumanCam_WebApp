@@ -1,7 +1,6 @@
 from flask import Flask, render_template, Response
 import cv2
 import zmq
-import time
 import numpy as np
 import threading
 import json
@@ -86,4 +85,4 @@ def index():
 if __name__ == '__main__':
     frameThread = threading.Thread(target=getFrames)
     frameThread.start()
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=8888)
