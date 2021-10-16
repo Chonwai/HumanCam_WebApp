@@ -3,7 +3,7 @@ module.exports = {
         {
             name: 'HumanCamWebApp',
             exec_mode: 'cluster',
-            instances: 'max', // Or a number of instances
+            instances: 2, // Or a number of instances
             script: 'app.py',
             args: 'start',
             watch: true,
