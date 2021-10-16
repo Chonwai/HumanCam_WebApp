@@ -2,12 +2,11 @@ module.exports = {
     apps: [
         {
             name: 'HumanCamWebApp',
-            exec_mode: 'cluster',
             instances: 2, // Or a number of instances
             cmd: 'app.py',
+            interpreter: 'python3',
             watch: true,
             autorestart: true,
-            interpreter: 'python3'
         }
     ]
 };
