@@ -17,7 +17,7 @@ def getFrames():
     global base64Frame, peopleIn, peopleOut
     context = zmq.Context()
     socket = context.socket(zmq.PULL)
-    socket.connect("tcp://127.0.0.1:5555")
+    socket.connect("tcp://0.0.0.0:5555")
 
     while True:
         response = json.loads(socket.recv())
