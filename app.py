@@ -1,3 +1,4 @@
+from time import sleep
 from flask import Flask, render_template, Response
 import cv2
 import zmq
@@ -17,14 +18,14 @@ def getFrames():
     global base64Frame, peopleIn, peopleOut
     context = zmq.Context()
     socket = context.socket(zmq.PULL)
-    socket.connect("tcp://0.0.0.0:5555")
+    socket.connect("tcp://127.0.0.1:5555")
 
     while True:
         response = json.loads(socket.recv())
         base64Frame = response['frame'].split("'")[1]
         peopleIn = response['peopleIn']
         peopleOut = response['peopleOut']
-        # time.sleep(0.1)
+        sleep(0.333)
 
 
 def gen_frames():  # generate frame by frame from camera
