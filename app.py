@@ -25,7 +25,6 @@ def getFrames():
         base64Frame = response['frame'].split("'")[1]
         peopleIn = response['peopleIn']
         peopleOut = response['peopleOut']
-        sleep(0.333)
 
 
 def gen_frames():  # generate frame by frame from camera
@@ -44,6 +43,7 @@ def gen_frames():  # generate frame by frame from camera
 def fetchFrames():
     global base64Frame
     while True:
+        sleep(0.5)
         frame = utils.Utils.convertBase64Frame2Frame(base64Frame)
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
