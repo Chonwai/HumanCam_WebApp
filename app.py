@@ -5,6 +5,7 @@ import zmq
 import numpy as np
 import threading
 import json
+import time
 from utils import utils
 
 app = Flask(__name__)
@@ -12,19 +13,38 @@ app = Flask(__name__)
 base64Frame = ''
 peopleIn = 0
 peopleOut = 0
+lastPeopleIn = 0
+lastPeopleOut = 0
+startTime = time.time()
 
 
 def getFrames():
     global base64Frame, peopleIn, peopleOut
+    global lastPeopleIn, lastPeopleOut
     context = zmq.Context()
     socket = context.socket(zmq.PULL)
     socket.connect("tcp://127.0.0.1:5555")
 
+    # print("People In Start! " + str(peopleIn))
+    # print("People Out Start! " + str(peopleOut))
+
+    response = json.loads(socket.recv())
+
     while True:
+        if response['peopleIn'] == 0 and response['peopleOut'] == 0:
+            # print("All 0!")
+            lastPeopleIn = 0
+            lastPeopleOut = 0
         response = json.loads(socket.recv())
         base64Frame = response['frame'].split("'")[1]
-        peopleIn = response['peopleIn']
-        peopleOut = response['peopleOut']
+        currentPeopleIn = response['peopleIn']
+        currentPeopleOut = response['peopleOut']
+        peopleIn = peopleIn + (currentPeopleIn - lastPeopleIn)
+        peopleOut = peopleOut + (currentPeopleOut - lastPeopleOut)
+        # print('Response PeopleIn: ' +
+        #       str(response['peopleIn']) + ' Global People In: ' + str(peopleIn) + ' Current People In: ' + str(currentPeopleIn) + ' Last People In: ' + str(lastPeopleIn) + ' Current - Last: ' + str(currentPeopleIn - lastPeopleIn))
+        lastPeopleIn = currentPeopleIn
+        lastPeopleOut = currentPeopleOut
 
 
 def gen_frames():  # generate frame by frame from camera
