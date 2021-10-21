@@ -7,44 +7,60 @@ import threading
 import json
 import time
 from utils import utils
+from flask_caching import Cache
+from config.cacha import config
+import redis
 
 app = Flask(__name__)
+app.config.from_mapping(config)
+cache = Cache(app)
+r = redis.Redis(host='redis', port=6379, decode_responses=True)
+r.set('people_in', 0)
+r.set('people_out', 0)
+r.set('base64HumanCounterFrame', '')
+r.set('base64AgeGenderFrame', '')
 
-base64Frame = ''
-peopleIn = 0
-peopleOut = 0
+
 lastPeopleIn = 0
 lastPeopleOut = 0
 startTime = time.time()
 
 
-def getFrames():
-    global base64Frame, peopleIn, peopleOut
+def getHumanCounterFrames():
     global lastPeopleIn, lastPeopleOut
     context = zmq.Context()
     socket = context.socket(zmq.PULL)
-    socket.connect("tcp://127.0.0.1:5555")
+    socket.connect("tcp://yolo:5555")
 
-    # print("People In Start! " + str(peopleIn))
-    # print("People Out Start! " + str(peopleOut))
+    while True:
+        response = json.loads(socket.recv())
+        if response['peopleIn'] == 0 and response['peopleOut'] == 0:
+            lastPeopleIn = 0
+            lastPeopleOut = 0
+        r.set('base64HumanCounterFrame', response['frame'].split("'")[1])
+        currentPeopleIn = response['peopleIn']
+        currentPeopleOut = response['peopleOut']
+        if (currentPeopleIn - lastPeopleIn) != 0 or (currentPeopleOut - lastPeopleOut) != 0:
+            print("Temp In: " + str(currentPeopleIn - lastPeopleIn))
+            print("Temp Out: " + str(currentPeopleOut - lastPeopleOut))
+            r.set('people_in', float(r.get('people_in')) +
+                  ((currentPeopleIn - lastPeopleIn) / 2))
+            r.set('people_out', float(r.get('people_out')) +
+                  ((currentPeopleOut - lastPeopleOut) / 2))
+        lastPeopleIn = currentPeopleIn
+        lastPeopleOut = currentPeopleOut
+
+
+def getAgeGenderFrame():
+    context = zmq.Context()
+    socket = context.socket(zmq.PULL)
+    socket.connect("tcp://127.0.0.1:5556")
 
     response = json.loads(socket.recv())
 
     while True:
-        if response['peopleIn'] == 0 and response['peopleOut'] == 0:
-            # print("All 0!")
-            lastPeopleIn = 0
-            lastPeopleOut = 0
         response = json.loads(socket.recv())
-        base64Frame = response['frame'].split("'")[1]
-        currentPeopleIn = response['peopleIn']
-        currentPeopleOut = response['peopleOut']
-        peopleIn = peopleIn + (currentPeopleIn - lastPeopleIn)
-        peopleOut = peopleOut + (currentPeopleOut - lastPeopleOut)
-        # print('Response PeopleIn: ' +
-        #       str(response['peopleIn']) + ' Global People In: ' + str(peopleIn) + ' Current People In: ' + str(currentPeopleIn) + ' Last People In: ' + str(lastPeopleIn) + ' Current - Last: ' + str(currentPeopleIn - lastPeopleIn))
-        lastPeopleIn = currentPeopleIn
-        lastPeopleOut = currentPeopleOut
+        r.set('base64AgeGenderFrame', response['frame'].split("'")[1])
 
 
 def gen_frames():  # generate frame by frame from camera
@@ -60,41 +76,52 @@ def gen_frames():  # generate frame by frame from camera
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
 
 
-def fetchFrames():
-    global base64Frame
+def fetchHumanCounterFrames():
     while True:
         sleep(0.5)
-        frame = utils.Utils.convertBase64Frame2Frame(base64Frame)
+        frame = utils.Utils.convertBase64Frame2Frame(
+            r.get('base64HumanCounterFrame'))
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+
+
+def fetchAgeGenderFrames():
+    while True:
+        sleep(0.5)
+        frame = utils.Utils.convertBase64Frame2Frame(
+            r.get('base64AgeGenderFrame'))
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
 
 
 @app.route('/people_in')
 def people_in():
-    global peopleIn
-    # Video streaming route. Put this in the src attribute of an img tag
-    return str(peopleIn)
+    res = float(r.get('people_in'))
+    return str(int(res))
 
 
 @app.route('/people_out')
 def people_out():
-    global peopleOut
-    # Video streaming route. Put this in the src attribute of an img tag
-    return str(peopleOut)
+    res = float(r.get('people_out'))
+    return str(int(res))
 
 
 @app.route('/people_flow')
 def people_flow():
-    global peopleIn, peopleOut
-    peopleFlow = peopleIn + peopleOut
-    # Video streaming route. Put this in the src attribute of an img tag
+    peopleFlow = int(float(r.get('people_in')) + float(r.get('people_out')))
     return str(peopleFlow)
 
 
-@app.route('/video_feed')
-def video_feed():
+@app.route('/human_counter_video_feed')
+def human_counter_video_feed():
     # Video streaming route. Put this in the src attribute of an img tag
-    return Response(fetchFrames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(fetchHumanCounterFrames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@app.route('/age_gender_video_feed')
+def age_gender_video_feed():
+    # Video streaming route. Put this in the src attribute of an img tag
+    return Response(fetchAgeGenderFrames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 @app.route('/')
@@ -104,6 +131,8 @@ def index():
 
 
 if __name__ == '__main__':
-    frameThread = threading.Thread(target=getFrames)
-    frameThread.start()
+    HumanCounterframeThread = threading.Thread(target=getHumanCounterFrames)
+    ageGenderFrameThread = threading.Thread(target=getAgeGenderFrame)
+    HumanCounterframeThread.start()
+    ageGenderFrameThread.start()
     app.run(debug=True, host='0.0.0.0', port=8888)

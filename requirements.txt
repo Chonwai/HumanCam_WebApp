@@ -1,3 +1,5 @@
 flask
 zmq
 numpy
+flask_caching
+redis

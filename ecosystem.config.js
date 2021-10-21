@@ -6,7 +6,7 @@ module.exports = {
             cmd: 'app.py',
             interpreter: 'python3',
             watch: true,
-            autorestart: true,
+            autorestart: true
         }
     ]
 };
