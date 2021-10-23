@@ -54,7 +54,7 @@ def getHumanCounterFrames():
 def getAgeGenderFrame():
     context = zmq.Context()
     socket = context.socket(zmq.PULL)
-    socket.connect("tcp://127.0.0.1:5556")
+    socket.connect("tcp://agd:5556")
 
     response = json.loads(socket.recv())
 

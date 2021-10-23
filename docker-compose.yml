@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  web:
+    build: ./
+    ports:
+      - 80:8888
+    volumes:
+      - ./:/web
+    networks:
+      - humancam
+    depends_on:
+      - redis
+  redis:
+    image: "redis"
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - ./data/:/data/
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - humancam
+networks:
+  humancam:
+    name: web_humancam
+    driver: bridge
