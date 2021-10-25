@@ -7,10 +7,13 @@ services:
       - 80:8888
     volumes:
       - ./:/web
+      - ./gunicorn.conf:/etc/supervisor/gunicorn.conf
+      - ./supervisord.conf:/etc/supervisor/supervisord.conf
     networks:
       - humancam
     depends_on:
       - redis
+    # restart: always
   redis:
     image: "redis"
     ports:
@@ -21,6 +24,7 @@ services:
     command: redis-server /usr/local/etc/redis/redis.conf
     networks:
       - humancam
+    # restart: always
 networks:
   humancam:
     name: web_humancam

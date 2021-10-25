@@ -1,5 +1,7 @@
-flask
 zmq
 numpy
-flask_caching
 redis
+gunicorn
+gevent
+supervisor
+flask

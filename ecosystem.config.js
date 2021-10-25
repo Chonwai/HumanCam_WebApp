@@ -2,7 +2,7 @@ module.exports = {
     apps: [
         {
             name: 'HumanCamWebApp',
-            instances: 4, // Or a number of instances
+            instances: 1, // Or a number of instances
             cmd: 'app.py',
             interpreter: 'python3',
             watch: true,

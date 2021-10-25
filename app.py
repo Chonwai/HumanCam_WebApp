@@ -1,4 +1,3 @@
-from time import sleep
 from flask import Flask, render_template, Response
 import cv2
 import zmq
@@ -6,14 +5,13 @@ import numpy as np
 import threading
 import json
 import time
+from time import sleep
 from utils import utils
-from flask_caching import Cache
 from config.cacha import config
 import redis
 
 app = Flask(__name__)
 app.config.from_mapping(config)
-cache = Cache(app)
 r = redis.Redis(host='redis', port=6379, decode_responses=True)
 r.set('people_in', 0)
 r.set('people_out', 0)
@@ -79,19 +77,19 @@ def gen_frames():  # generate frame by frame from camera
 def fetchHumanCounterFrames():
     while True:
         sleep(0.5)
-        frame = utils.Utils.convertBase64Frame2Frame(
-            r.get('base64HumanCounterFrame'))
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+        if (r.get('base64HumanCounterFrame') != ''):
+            frame = utils.Utils.convertBase64Frame2Frame(r.get('base64HumanCounterFrame'))
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
 
 
 def fetchAgeGenderFrames():
     while True:
         sleep(0.5)
-        frame = utils.Utils.convertBase64Frame2Frame(
-            r.get('base64AgeGenderFrame'))
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+        if (r.get('base64AgeGenderFrame') != ''):
+            frame = utils.Utils.convertBase64Frame2Frame(r.get('base64AgeGenderFrame'))
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
 
 
 @app.route('/people_in')

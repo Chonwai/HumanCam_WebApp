@@ -13,35 +13,49 @@
 </head>
 
 <body>
-    <div class="">
+    <div>
         <div class="min-h-screen bg-gray-100">
             <!-- Import Header Component -->
-            {% include 'components/Header.html' %}
-            <main class="py-10">
-                {% include 'components/HumanStats.html' %}
-                <section class="mb-8">
-                    <header>
-                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <h1 class="text-3xl font-bold leading-tight text-gray-900">
-                                Video Streaming
-                            </h1>
-                        </div>
-                    </header>
-                    <div>
-                        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                            <!-- Replace with your content -->
-                            <div class="px-4 py-8 sm:px-0">
-                                <div
-                                    class="p-4 border-4 border-dashed border-gray-200 rounded-lg flex flex-col justify-center items-center align-center">
-                                    <img src="{{ url_for('human_counter_video_feed') }}" width="90%" height="auto">
-                                    <img src="{{ url_for('age_gender_video_feed') }}" width="90%" height="auto">
-                                </div>
+            {% include 'components/Sidebar.html' %}
+            <div class="md:pl-64 flex flex-col flex-1">
+                <div class="sticky top-0 z-10 md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3 bg-gray-100">
+                  <button type="button" class="-ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                    <span class="sr-only">Open sidebar</span>
+                    <!-- Heroicon name: outline/menu -->
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                  </button>
+                </div>
+                <main class="flex-1 pt-8">
+                    {% include 'components/HumanStats.html' %}
+                    <section class="mb-8">
+                        <header>
+                            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                <h1 class="text-3xl font-bold leading-tight text-gray-900">
+                                    Video Streaming
+                                </h1>
                             </div>
-                            <!-- /End replace -->
+                        </header>
+                        <div>
+                            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                                <!-- Replace with your content -->
+                                <div class="px-4 py-8 sm:px-0 flex flex-row justify-center items-center align-center">
+                                    <div
+                                        class="flex-1 mr-2 p-4 border-4 border-dashed border-gray-200 rounded-lg">
+                                        <img src="{{ url_for('human_counter_video_feed') }}" width="100%" height="auto">
+                                    </div>
+                                    <div
+                                        class="flex-1 ml-2 p-4 border-4 border-dashed border-gray-200 rounded-lg">
+                                        <img src="{{ url_for('age_gender_video_feed') }}" width="100%" height="auto">
+                                    </div>
+                                </div>
+                                <!-- /End replace -->
+                            </div>
                         </div>
-                    </div>
-                </section>
-            </main>
+                    </section>
+                </main>
+            </div>
         </div>
         <!-- Import Footer Component -->
         {% include 'components/Footer.html' %}
