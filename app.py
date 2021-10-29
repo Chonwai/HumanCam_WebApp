@@ -1,14 +1,14 @@
 from flask import Flask, render_template, Response
-import cv2
+from service.schedule import dashboardSchedule
 import zmq
 import numpy as np
 import threading
 import json
-import time
 from time import sleep
 from utils import utils
 from config.cacha import config
 import redis
+
 
 app = Flask(__name__)
 app.config.from_mapping(config)
@@ -21,7 +21,6 @@ r.set('base64AgeGenderFrame', '')
 
 lastPeopleIn = 0
 lastPeopleOut = 0
-startTime = time.time()
 
 
 def getHumanCounterFrames():
@@ -59,20 +58,7 @@ def getAgeGenderFrame():
     while True:
         response = json.loads(socket.recv())
         r.set('base64AgeGenderFrame', response['frame'].split("'")[1])
-
-
-def gen_frames():  # generate frame by frame from camera
-    while True:
-        # Capture frame-by-frame
-        success, frame = camera.read()  # read the camera frame
-        if not success:
-            break
-        else:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
-
+        
 
 def fetchHumanCounterFrames():
     while True:
@@ -129,8 +115,10 @@ def index():
 
 
 if __name__ == '__main__':
-    HumanCounterframeThread = threading.Thread(target=getHumanCounterFrames)
+    humanCounterframeThread = threading.Thread(target=getHumanCounterFrames)
     ageGenderFrameThread = threading.Thread(target=getAgeGenderFrame)
-    HumanCounterframeThread.start()
+    dashboardScheduleThread = threading.Thread(target=dashboardSchedule)
+    humanCounterframeThread.start()
     ageGenderFrameThread.start()
+    dashboardScheduleThread.start()
     app.run(debug=True, host='0.0.0.0', port=8888)
