@@ -1,5 +1,8 @@
+import os
 from flask import Flask, render_template, Response
 from service.schedule import dashboardSchedule
+from apscheduler.schedulers.background import BackgroundScheduler
+from service.schedule import ScheduleService
 import zmq
 import numpy as np
 import threading
@@ -8,6 +11,8 @@ from time import sleep
 from utils import utils
 from config.cacha import config
 import redis
+
+os.environ['TZ'] = 'Asia/Taipei'
 
 
 app = Flask(__name__)
@@ -58,13 +63,14 @@ def getAgeGenderFrame():
     while True:
         response = json.loads(socket.recv())
         r.set('base64AgeGenderFrame', response['frame'].split("'")[1])
-        
+
 
 def fetchHumanCounterFrames():
     while True:
         sleep(0.5)
         if (r.get('base64HumanCounterFrame') != ''):
-            frame = utils.Utils.convertBase64Frame2Frame(r.get('base64HumanCounterFrame'))
+            frame = utils.Utils.convertBase64Frame2Frame(
+                r.get('base64HumanCounterFrame'))
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
 
@@ -73,7 +79,8 @@ def fetchAgeGenderFrames():
     while True:
         sleep(0.5)
         if (r.get('base64AgeGenderFrame') != ''):
-            frame = utils.Utils.convertBase64Frame2Frame(r.get('base64AgeGenderFrame'))
+            frame = utils.Utils.convertBase64Frame2Frame(
+                r.get('base64AgeGenderFrame'))
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
 
