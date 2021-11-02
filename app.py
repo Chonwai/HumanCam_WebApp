@@ -1,7 +1,6 @@
 import os
 from flask import Flask, render_template, Response
 from service.schedule import dashboardSchedule
-from apscheduler.schedulers.background import BackgroundScheduler
 from service.schedule import ScheduleService
 import zmq
 import numpy as np
@@ -36,19 +35,19 @@ def getHumanCounterFrames():
 
     while True:
         response = json.loads(socket.recv())
-        if response['peopleIn'] == 0 and response['peopleOut'] == 0:
+        if response['people_in'] == 0 and response['people_out'] == 0:
             lastPeopleIn = 0
             lastPeopleOut = 0
         r.set('base64HumanCounterFrame', response['frame'].split("'")[1])
-        currentPeopleIn = response['peopleIn']
-        currentPeopleOut = response['peopleOut']
+        currentPeopleIn = response['people_in']
+        currentPeopleOut = response['people_out']
         if (currentPeopleIn - lastPeopleIn) != 0 or (currentPeopleOut - lastPeopleOut) != 0:
             print("Temp In: " + str(currentPeopleIn - lastPeopleIn))
             print("Temp Out: " + str(currentPeopleOut - lastPeopleOut))
             r.set('people_in', float(r.get('people_in')) +
-                  ((currentPeopleIn - lastPeopleIn) / 2))
+                  (currentPeopleIn - lastPeopleIn))
             r.set('people_out', float(r.get('people_out')) +
-                  ((currentPeopleOut - lastPeopleOut) / 2))
+                  (currentPeopleOut - lastPeopleOut))
         lastPeopleIn = currentPeopleIn
         lastPeopleOut = currentPeopleOut
 
@@ -128,4 +127,4 @@ if __name__ == '__main__':
     humanCounterframeThread.start()
     ageGenderFrameThread.start()
     dashboardScheduleThread.start()
-    app.run(debug=True, host='0.0.0.0', port=8888)
+    app.run(debug=True, host='0.0.0.0', port=8888, use_reloader=False)
