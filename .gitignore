@@ -3,3 +3,5 @@ node_modules
 data/*
 supervisord.log
 storage/report/*
+.DS_Store
+**/.DS_Store
