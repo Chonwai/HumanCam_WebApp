@@ -28,30 +28,16 @@
                   </button>
                 </div>
                 <main class="flex-1 p-8">
-                    {% include 'components/HumanStats.html' %}
-                    <section class="mb-8">
-                        <header>
-                            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                                <h1 class="text-3xl font-bold leading-tight text-gray-900">
-                                    實時畫面
-                                </h1>
-                            </div>
-                        </header>
-                        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                            <!-- Replace with your content -->
-                            <div class="px-4 py-8 sm:px-0 flex flex-row justify-center items-center align-center">
-                                <div
-                                    class="flex-1 mr-2 p-4 border-4 border-dashed border-gray-200 rounded-lg">
-                                    <img src="{{ url_for('human_counter_video_feed') }}" width="100%" height="auto">
-                                </div>
-                                <div
-                                    class="flex-1 ml-2 p-4 border-4 border-dashed border-gray-200 rounded-lg">
-                                    <img src="{{ url_for('age_gender_video_feed') }}" width="100%" height="auto">
-                                </div>
-                            </div>
-                            <!-- /End replace -->
+                    <header class="mb-8">
+                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <h1 class="text-3xl font-bold leading-tight text-gray-900">
+                                {{ filename }} 報表
+                            </h1>
                         </div>
-                    </section>
+                    </header>
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        
+                    </div>
                 </main>
             </div>
         </div>

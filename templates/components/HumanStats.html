@@ -3,49 +3,13 @@
         <header>
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h1 class="text-3xl font-bold leading-tight text-gray-900">
-                    Human Counter
+                    人流統計
                 </h1>
             </div>
         </header>
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <dl class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                <div class="relative bg-white pt-5 px-4 sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden">
-                    <dt>
-                        <div class="absolute bg-indigo-500 rounded-md p-3">
-                            <!-- Heroicon name: outline/users -->
-                            <svg class="h-6 w-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
-                                </path>
-                            </svg>
-                        </div>
-                        <p class="ml-16 text-sm font-medium text-gray-500 truncate">Total Flow</p>
-                    </dt>
-                    <dd class="ml-16 pb-6 flex items-baseline sm:pb-7">
-                        <p id="people-flow" class="text-2xl font-semibold text-gray-900"></p>
-                    </dd>
-                </div>
-
-                <div class="relative bg-white pt-5 px-4 sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden">
-                    <dt>
-                        <div class="absolute bg-indigo-500 rounded-md p-3">
-                            <!-- Heroicon name: outline/mail-open -->
-                            <svg class="h-6 w-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76">
-                                </path>
-                            </svg>
-                        </div>
-                        <p class="ml-16 text-sm font-medium text-gray-500 truncate">People In</p>
-                    </dt>
-                    <dd class="ml-16 pb-6 flex items-baseline sm:pb-7">
-                        <p class="text-2xl font-semibold text-gray-900" id="people-in"></p>
-                    </dd>
-                </div>
-
-                <div class="relative bg-white pt-5 px-4 sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <dl class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-1">
+                <div class="relative bg-white py-5 px-4 sm:py-6 sm:px-6 shadow rounded-lg overflow-hidden">
                     <dt>
                         <div class="absolute bg-indigo-500 rounded-md p-3">
                             <!-- Heroicon name: outline/cursor-click -->
@@ -56,10 +20,10 @@
                                 </path>
                             </svg>
                         </div>
-                        <p class="ml-16 text-sm font-medium text-gray-500 truncate">People Out</p>
+                        <p class="ml-16 text-sm font-medium text-gray-500 truncate">預測人流</p>
                     </dt>
-                    <dd class="ml-16 pb-6 flex items-baseline sm:pb-7">
-                        <p id="people-out" class="text-2xl font-semibold text-gray-900"></p>
+                    <dd class="ml-16 flex items-baseline">
+                        <p id="people-out" class="text-2xl font-semibold text-gray-900">獲取數據中......</p>
                     </dd>
                 </div>
             </dl>
@@ -67,14 +31,8 @@
         <script type="text/javascript">
             $(function () {
                 setInterval(() => {
-                    $.get($SCRIPT_ROOT + '/people_in', function (data) {
-                        $("#people-in").text(data);
-                    });
                     $.get($SCRIPT_ROOT + '/people_out', function (data) {
                         $("#people-out").text(data);
-                    });
-                    $.get($SCRIPT_ROOT + '/people_flow', function (data) {
-                        $("#people-flow").text(data);
                     });
                 }, 3000)
             });
