@@ -1,4 +1,4 @@
 #!/bin/bash
 echo python --version
 
-python timezone.py
+python app.py
