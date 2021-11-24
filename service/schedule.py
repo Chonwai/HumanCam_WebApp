@@ -1,8 +1,6 @@
 from utils.utils import Utils
 import schedule
-import os
 import time
-import sys
 from datetime import datetime
 import redis
 from csv import DictWriter
@@ -14,7 +12,7 @@ r = redis.Redis(host='redis', port=6379, decode_responses=True)
 
 class ScheduleService:
     @staticmethod
-    def job():
+    def resetValue():
         r.set('people_in', 0)
         r.set('people_out', 0)
 
@@ -31,7 +29,7 @@ class ScheduleService:
 
 def dashboardSchedule():
     schedule.every().hour.do(ScheduleService.updateDailyReport)
-    schedule.every().day.at("00:00").do(ScheduleService.job)
+    schedule.every().day.at("00:00").do(ScheduleService.resetValue)
     while True:
         schedule.run_pending()
         time.sleep(1)

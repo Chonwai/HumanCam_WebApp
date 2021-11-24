@@ -11,9 +11,9 @@ from utils import utils
 from config.cacha import config
 from routes.web.report import report
 import redis
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
-load_dotenv()
+# load_dotenv()
 os.environ['TZ'] = 'Asia/Taipei'
 
 
@@ -21,7 +21,7 @@ app = Flask(__name__)
 app.config.from_mapping(config)
 app.register_blueprint(report)
 
-r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r = redis.Redis(host='redis', port=6379, decode_responses=True)
 r.set('people_in', 0)
 r.set('people_out', 0)
 r.set('base64HumanCounterFrame', '')

@@ -6,3 +6,4 @@ gevent
 supervisor
 flask
 schedule
+pandas

@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, send_from_directory
 import glob
 import os
+import pandas as pd
 
 report = Blueprint('report', __name__)
 
@@ -21,4 +22,8 @@ def reportDownload(filename):
 
 @report.route("/reports/<path:filename>")
 def reportViewer(filename):
-    return render_template('report.html', filename=filename)
+    df = pd.read_csv(os.path.join(
+        'storage/report/{filename}.csv'.format(filename=filename)))
+    df.sort_values(by=['created_at'])
+    chart_data = df.to_dict(orient='records')
+    return render_template('report.html', filename=filename, data=chart_data)
