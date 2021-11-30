@@ -22,8 +22,8 @@ app.config.from_mapping(config)
 app.register_blueprint(report)
 
 r = redis.Redis(host='redis', port=6379, decode_responses=True)
-r.set('people_in', 0)
-r.set('people_out', 0)
+r.set('people_in', utils.Utils.getPeopleIn())
+r.set('people_out', utils.Utils.getPeopleOut())
 r.set('base64HumanCounterFrame', '')
 r.set('base64AgeGenderFrame', '')
 
